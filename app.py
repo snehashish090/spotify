@@ -2,6 +2,7 @@ from flask import *
 from search import SearchAll
 from main import Single, Playlist
 import os
+import sys
 
 app = Flask(__name__)
 
@@ -52,7 +53,8 @@ def download():
     with open('config.json', 'r') as file:
         path = json.load(file)[0]
     Single(request.args['title'], request.args['artist'], request.args['album'], request.args['image'], path = path)
-
+    if sys.platform == "darwin" or sys.platform == 'Darwin':
+        os.system('open {}.mp3'.format(path+"/"+request.args['title']))
     return redirect('/single')
 
 @app.route('/select', methods=['GET', 'POST'])

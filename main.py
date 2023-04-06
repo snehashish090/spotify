@@ -74,7 +74,7 @@ def playlist(path):
         test.append(name)
         ur = i['track']['album']['images'][0]['url']
         pdownload(ur, name)
-
+        
         url = searchYoutube(name+" "+artist + " Audio ")
 
         Download(url, name.replace(' ', '-'), path)
@@ -87,6 +87,7 @@ def playlist(path):
         audiofile.tag.title = name
         audiofile.tag.album = album
         audiofile.tag.save()
+        os.remove('images/'+name+".jpg")
         os.system('clear')
         print(playlist['items'].index(i)+1 * (100/l), '% done')
 
@@ -103,6 +104,7 @@ def single(path):
     ur = song.get('image')
     print("getting song from youtube")
     pdownload(ur, name)
+    
     print("Downloaded the image")
     Download(url, name.replace(' ', '-'), path)
     print("Downloaded the song")
@@ -115,6 +117,7 @@ def single(path):
     audiofile.tag.title = name
     audiofile.tag.album = album
     audiofile.tag.save()
+    os.remove('images/'+name+".jpg")
     print("Done")
 
 def Single(name,artist,album,ur, path):
@@ -123,6 +126,7 @@ def Single(name,artist,album,ur, path):
     url = searchYoutube(name+" "+artist + " Audio ")
     print("getting song from youtube")
     pdownload(ur, name)
+    
     print("Downloaded the image")
     Download(url, name.replace(' ', '-'), path)
     print("Downloaded the song")
@@ -135,13 +139,16 @@ def Single(name,artist,album,ur, path):
     audiofile.tag.title = name
     audiofile.tag.album = album
     audiofile.tag.save()
+    os.remove('images/'+name+".jpg")
     print("Done")
+    
 # if "single" in x:
 #     single()
 # else:
 #     playlist()
 # os.system('clear')
 # print("Operation Completed thank You For Using The App")
+
 def Playlist(playlist_link, path):
     test = []
     
@@ -156,6 +163,7 @@ def Playlist(playlist_link, path):
         test.append(name)
         ur = i['track']['album']['images'][0]['url']
         pdownload(ur, name)
+        
 
         url = searchYoutube(name+" "+artist + " Audio ")
 
@@ -170,6 +178,7 @@ def Playlist(playlist_link, path):
         audiofile.tag.album = album
         audiofile.tag.save()
         os.system('clear')
+        os.remove('images/'+name+".jpg")
         print(playlist['items'].index(i)+1 * (100/l), '% done')
     print(test)
 
