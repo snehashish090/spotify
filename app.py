@@ -4,6 +4,7 @@ from main import Single, Playlist
 import os
 import sys
 from pathlib import Path
+import webbrowser
 
 app = Flask(__name__)
 
@@ -287,4 +288,6 @@ def select():
     else:
         return render_template('selectpath.html')
 if __name__ == '__main__':
+    webbrowser.open('http://127.0.0.1:5555/')
     app.run(debug=True, port =5555)
+    
