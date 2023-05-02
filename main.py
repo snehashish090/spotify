@@ -32,7 +32,7 @@ def pdownload(url, name):
 
 
 def Download(link, name, path):
-    youtubeObject = YouTube(link)
+    youtubeObject = YouTube(link, use_oauth=True, allow_oauth_cache=True)
     youtubeObject = youtubeObject.streams.get_highest_resolution()
     try:
         youtubeObject.download(path, filename=name+'.mp4')

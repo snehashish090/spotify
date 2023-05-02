@@ -5,8 +5,11 @@ import os
 import sys
 from pathlib import Path
 import webbrowser
+from flaskwebgui import FlaskUI
 
 app = Flask(__name__)
+
+
 
 indexFile = """
 <!DOCTYPE html>
@@ -235,7 +238,7 @@ def home():
         return redirect('/select')
             
     if request.method == 'POST':
-        w = request.form.get('search')
+        w = request.form.get('searchbar')
         x = SearchAll(w)
         return render_template('single.html', data = x)
 
@@ -247,6 +250,12 @@ def index():
 
     if request.method == 'GET':
         return render_template('index.html')
+    elif request.method == "POST":
+        query = request.form.get('searchbar')
+        x = SearchAll(query)
+        return render_template('single.html', data = x)
+    else:
+        return 'Hello World'
 
 
 @app.route('/playlist', methods = ['GET', 'POST'])
@@ -288,6 +297,6 @@ def select():
     else:
         return render_template('selectpath.html')
 if __name__ == '__main__':
-    webbrowser.open('http://127.0.0.1:5555/')
-    app.run(debug=True, port =5555)
-    
+    ui = FlaskUI(app=app, server="flask",width=1000, height=1000) 
+    ui.run()
+    # app.run(debug=True)
