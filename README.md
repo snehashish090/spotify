@@ -31,7 +31,7 @@ Go to https://developer.spotify.com and create a project. Paste your client id a
 Open config.json and configure the path to where you want to store your mp3 files. It should looke somthing like :
 ```json
 [
-    '~/Users/username/music/'
+    "~/Users/username/music/"
 ]
 ```
 
