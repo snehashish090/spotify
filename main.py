@@ -16,35 +16,55 @@ if not os.path.exists('config.json'):
     with open('config.json', 'w') as file:   
         json.dump([], file)
 
-
+if not os.path.exists('creds.json'):
+    with open('config.json', 'w') as file:   
+        json.dump([], file)
 
 if not os.path.exists('images/'):
     os.mkdir('images/')
 
-clientId = "17afd740ee4a41ea9e6c79605a4a2a37"
-clientSecret = "264e23c7d072426b89b4182edc0a524e"
+# Getting Auth details
+with open("creds.json","r") as file:
+    data = json.load(file)
+    clientId=data['clientId']
+    clientSecret=data['clientSecret']
 
-
+# Function to download the image
 def pdownload(url, name):
+    print("Downloading the Image...")
     req = requests.get(url)
     with open('images/'+name+'.jpg', 'wb') as file:
         file.write(req.content)
+    print("Image Download successfull")
 
-
+# Function to download the song
 def Download(link, name, path):
-    youtubeObject = YouTube(link, use_oauth=True, allow_oauth_cache=True)
+    print("Downloading the Video")
+    # Intiaizing the YouTube object
+    youtubeObject = YouTube(link)
+    # Getting the video
     youtubeObject = youtubeObject.streams.get_highest_resolution()
     try:
-        youtubeObject.download(path, filename=name+'.mp4')
+        # Downloading it
+        youtubeObject.download(os.path.join(path), filename=name+'.mp4')
+        print("Download Successfull")
     except:
+        # Handling Error
         print("An error has occurred")
 
-    video = VideoFileClip(path+'/'+name+".mp4")
+    print("Converting Video to Audio")
+
+    # Using moviepy to convert mp4 to mp3
+    video = VideoFileClip(os.path.join(path,name+".mp4"))
     video.audio.write_audiofile(
-        path+'/'+name+".mp3", verbose=None, logger=None)
-    os.remove(path+'/'+name+".mp4")
+        os.path.join(path,name+".mp4"))
+    
+    # Removing the mp4
+    os.remove(os.path.join(path,name+".mp4"))
 
+    print(("Converted to mp3 format Successfully"))
 
+# Function to get the url for a song from YouTube
 def searchYoutube(name):
     x = Search(name).results
     if len(x) == 0:
@@ -52,62 +72,24 @@ def searchYoutube(name):
     else:
         return x[0].watch_url
 
-
 # Authentication - without user
 client_credentials_manager = SpotifyClientCredentials(
     client_id=clientId, client_secret=clientSecret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-# x = input('enter mode (playlist/single):')
 
 
-def playlist(path):
-    test = []
-    playlist_link = input('enter playlist link: ')
-    playlist = sp.playlist_tracks(playlist_link)
-    l = len(playlist['items'])
-
-    for i in playlist['items']:
-        name = i['track']['name']
-        artist = i['track']['artists'][0]['name']
-        album = i['track']['album']['name']
-
-        test.append(name)
-        ur = i['track']['album']['images'][0]['url']
-        pdownload(ur, name)
-        
-        url = searchYoutube(name+" "+artist + " Audio ")
-
-        Download(url, name.replace(' ', '-'), path)
-        audiofile = eyed3.load(path+'/'+name.replace(' ', '-')+'.mp3')
-        if (audiofile.tag == None):
-            audiofile.initTag()
-        audiofile.tag.images.set(ImageFrame.FRONT_COVER, open(
-            'images/'+name+'.jpg', 'rb').read(), 'image/jpeg')
-        audiofile.tag.artist = artist
-        audiofile.tag.title = name
-        audiofile.tag.album = album
-        audiofile.tag.save()
-        os.remove('images/'+name+".jpg")
-        os.system('clear')
-        print(playlist['items'].index(i)+1 * (100/l), '% done')
-
-    print(test)
-
-
-def single(path):
-    song = search.Search(input("Enter Song (with artist name): "))
-    name = song.get('name')
-    artist = song.get('artist')
-    album = song.get('album')
-    print("Info Recieved")
+def Single(name:str,artist:str,album:str,ur:str, path:str):
+    
+    # Getting the YouTube
     url = searchYoutube(name+" "+artist + " Audio ")
-    ur = song.get('image')
-    print("getting song from youtube")
+
+    # Downloading the Cover Art
     pdownload(ur, name)
     
-    print("Downloaded the image")
+    # Downloading the YouTube video as mp3
     Download(url, name.replace(' ', '-'), path)
-    print("Downloaded the song")
+
+    # Editing the metadata
     audiofile = eyed3.load(path+'/'+name.replace(' ', '-')+'.mp3')
     if (audiofile.tag == None):
         audiofile.initTag()
@@ -117,68 +99,58 @@ def single(path):
     audiofile.tag.title = name
     audiofile.tag.album = album
     audiofile.tag.save()
-    os.remove('images/'+name+".jpg")
-    print("Done")
 
-def Single(name,artist,album,ur, path):
-    
-    print("Info Recieved")
-    url = searchYoutube(name+" "+artist + " Audio ")
-    print("getting song from youtube")
-    pdownload(ur, name)
-    
-    print("Downloaded the image")
-    Download(url, name.replace(' ', '-'), path)
-    print("Downloaded the song")
-    audiofile = eyed3.load(path+'/'+name.replace(' ', '-')+'.mp3')
-    if (audiofile.tag == None):
-        audiofile.initTag()
-    audiofile.tag.images.set(ImageFrame.FRONT_COVER, open(
-        'images/'+name+'.jpg', 'rb').read(), 'image/jpeg')
-    audiofile.tag.artist = artist
-    audiofile.tag.title = name
-    audiofile.tag.album = album
-    audiofile.tag.save()
     os.remove('images/'+name+".jpg")
     print("Done")
     
-# if "single" in x:
-#     single()
-# else:
-#     playlist()
-# os.system('clear')
-# print("Operation Completed thank You For Using The App")
 
-def Playlist(playlist_link, path):
-    test = []
+
+def Playlist(playlist_link:str, path:str):
+    """
+    Function to get download a public spotify playlist
+
+    params:
+        -playlist_link
+        -path
+    """
     
+    # Fetching the playlist data from the Spotify API
     playlist = sp.playlist_tracks(playlist_link)
+    
+    # Getting the length of the playlist
     l = len(playlist['items'])
 
+    # Going through every song in the playlist
     for i in playlist['items']:
+
+        # Getting the details of the song
         name = i['track']['name']
         artist = i['track']['artists'][0]['name']
         album = i['track']['album']['name']
-
-        test.append(name)
         ur = i['track']['album']['images'][0]['url']
+
+        # Downloading the Album Art for the song
         pdownload(ur, name)
         
-
+        # Getting the YouTube url for a song 
         url = searchYoutube(name+" "+artist + " Audio ")
-
+        
+        # Downloading the YouTube video as an mp3
         Download(url, name.replace(' ', '-'), path)
+
+        # Editing the metadata of the file
         audiofile = eyed3.load(path+'/'+name.replace(' ', '-')+'.mp3')
         if (audiofile.tag == None):
             audiofile.initTag()
         audiofile.tag.images.set(ImageFrame.FRONT_COVER, open(
             'images/'+name+'.jpg', 'rb').read(), 'image/jpeg')
+
         audiofile.tag.artist = artist
         audiofile.tag.title = name
         audiofile.tag.album = album
         audiofile.tag.save()
-        os.system('clear')
+
         os.remove('images/'+name+".jpg")
-        print(playlist['items'].index(i)+1 * (100/l), '% done')
-    print(test)
+
+
 

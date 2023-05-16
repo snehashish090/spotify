@@ -2,9 +2,10 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import json
 
-
-clientId = "17afd740ee4a41ea9e6c79605a4a2a37"
-clientSecret = "264e23c7d072426b89b4182edc0a524e"
+with open("creds.json","r") as file:
+    data = json.load(file)
+    clientId=data['clientId']
+    clientSecret=data['clientSecret']
 
 # Authentication - without user
 client_credentials_manager = SpotifyClientCredentials(
@@ -12,7 +13,7 @@ client_credentials_manager = SpotifyClientCredentials(
 
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-
+# Function to search and get only one result
 def Search(name):
     var = sp.search(name)['tracks']['items'][0]
 
@@ -24,6 +25,7 @@ def Search(name):
         'var': var
     }
 
+# Function to get all the results for a search query
 def SearchAll(name):
     ans = []
     x = sp.search(name)['tracks']['items']

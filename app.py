@@ -5,11 +5,8 @@ import os
 import sys
 from pathlib import Path
 import webbrowser
-from flaskwebgui import FlaskUI
 
 app = Flask(__name__)
-
-
 
 indexFile = """
 <!DOCTYPE html>
@@ -297,6 +294,4 @@ def select():
     else:
         return render_template('selectpath.html')
 if __name__ == '__main__':
-    ui = FlaskUI(app=app, server="flask",width=1000, height=1000) 
-    ui.run()
-    # app.run(debug=True)
+    app.run(debug=True)

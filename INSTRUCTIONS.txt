@@ -1,4 +1,0 @@
-Welcome to Menous Spotify Downloader!
-Here is a step by step procces of running the app
-
-Step 1: Install Pyton from the official python website
