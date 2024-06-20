@@ -126,7 +126,7 @@ def Playlist(playlist_link:str, path:str):
     
     # Fetching the playlist data from the Spotify API
     playlist = sp.playlist_tracks(playlist_link)
-    
+    return playlist
     # Getting the length of the playlist
     l = len(playlist['items'])
 
@@ -161,6 +161,5 @@ def Playlist(playlist_link:str, path:str):
         audiofile.tag.save()
 
         os.remove('images/'+name+".jpg")
-
 
 
