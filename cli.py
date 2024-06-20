@@ -1,4 +1,4 @@
-import * from main
+from main import *
 
 def playlist(path):
 
@@ -60,3 +60,5 @@ def single(path):
     audiofile.tag.save()
     os.remove('images/'+name+".jpg")
     print("Done")
+
+single(".")

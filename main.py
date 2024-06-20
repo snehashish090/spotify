@@ -10,15 +10,25 @@ from pytube import Search
 import search
 import sys
 import json
+from pathlib import Path
 
+export_path = str(Path(__file__).parent)+"/exports/"
+
+if not os.path.exists(export_path):
+    os.mkdir(export_path)
 
 if not os.path.exists('config.json'):
     with open('config.json', 'w') as file:   
-        json.dump([], file)
+        json.dump([export_path], file)
 
 if not os.path.exists('creds.json'):
-    with open('config.json', 'w') as file:   
-        json.dump([], file)
+    with open('creds.json', 'w') as file:
+        clientId = input("enter client id: ")
+        clientSecret = input("enter client secret: ")   
+        json.dump({
+            "clientId":clientId,
+            "clientSecret":clientSecret
+        }, file)
 
 if not os.path.exists('images/'):
     os.mkdir('images/')
@@ -57,7 +67,7 @@ def Download(link, name, path):
     # Using moviepy to convert mp4 to mp3
     video = VideoFileClip(os.path.join(path,name+".mp4"))
     video.audio.write_audiofile(
-        os.path.join(path,name+".mp4"))
+        os.path.join(path,name+".mp3"))
     
     # Removing the mp4
     os.remove(os.path.join(path,name+".mp4"))
@@ -81,7 +91,7 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 def Single(name:str,artist:str,album:str,ur:str, path:str):
     
     # Getting the YouTube
-    url = searchYoutube(name+" "+artist + " Audio ")
+    url = searchYoutube(name+" "+artist + " Official Original Audio ")
 
     # Downloading the Cover Art
     pdownload(ur, name)
