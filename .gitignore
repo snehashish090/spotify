@@ -1,2 +1,6 @@
 creds.json
 config.json
+env
+.cache
+exports
+images

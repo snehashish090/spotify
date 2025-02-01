@@ -68,6 +68,7 @@ def download():
 
     filename = '{}.mp3'.format(path+"/"+request.args['title'])
     attachement = send_file(filename, as_attachment=True, download_name=filename)
+    print(filename)
     os.remove(filename)
     return attachement
 
